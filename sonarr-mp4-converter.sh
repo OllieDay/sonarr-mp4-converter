@@ -15,6 +15,11 @@ if [ $sonarr_eventtype != "Download" ]; then
 	exit 0
 fi
 
+if [ ! "$sonarr_isupgrade" ]; then
+	>&2 echo "sonarr_isupgrade is not set."
+	exit 1
+fi
+
 if [ ! "$sonarr_episodefile_path" ]; then
 	>&2 echo "sonarr_episodefile_path is not set."
 	exit 1
@@ -27,12 +32,13 @@ fi
 
 destination="${sonarr_episodefile_path%.*}.mp4"
 
-if [ -f "$destination" ]; then
+# Only overwrite the destination file if sonarr_isupgrade is set to True
+if [ $sonarr_isupgrade != "True" ] && [ -f "$destination" ]; then
 	>&2 echo "File $destination already exists."
 	exit 1
 fi
 
-if ! ffmpeg -i "$sonarr_episodefile_path" -codec copy "$destination" &> /dev/null; then
+if ! ffmpeg -i "$sonarr_episodefile_path" -codec copy -y "$destination" &> /dev/null; then
 	>&2 echo "Failed to convert $sonarr_episodefile_path"
 	exit 1
 fi
