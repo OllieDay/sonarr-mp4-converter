@@ -30,6 +30,11 @@ if [ ! -f "$sonarr_episodefile_path" ]; then
 	exit 1
 fi
 
+# No need to convert as it's already an MP4
+if [[ $sonarr_episodefile_path == *.mp4 ]]; then
+	exit 0
+fi
+
 destination="${sonarr_episodefile_path%.*}.mp4"
 
 # Only overwrite the destination file if sonarr_isupgrade is set to True
